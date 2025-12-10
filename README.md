@@ -45,7 +45,7 @@
 
 ### **（1）建立 Person（登入帳號）**
 --  person.json
-```json
+
 {
   "resourceType": "Person",
   "identifier": [
@@ -55,7 +55,7 @@
 }
 ```
 ### **（2）建立 Patient（若首次登入）**
---  patient.json
+
 ```json
 {
   "resourceType": "Patient",
