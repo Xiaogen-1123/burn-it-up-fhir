@@ -116,6 +116,8 @@
   ]
 }
 ```
+---
+
 ## 四、說明文件（FHIR 實作邏輯）
 1. 使用者登入邏輯
 - 系統依 Email 查詢 Person
@@ -127,7 +129,7 @@
 
 3. 建立報名（Appointment）邏輯
 - 使用者選定 Slot 後：
-    -      建立 Appointment
+    - 建立 Appointment
     - 將 Slot.status = busy
     - participant 連結 Patient 與活動人員
     - extension 記錄用餐偏好（葷 / 素）
@@ -135,6 +137,8 @@
 4. 查詢應用示例
 - 查某 Slot 的所有預約紀錄（Appointment.slot）
 - 查某醫師的排班（Schedule.actor + PractitionerRole）
+
+---
 
 ## 五、程式可能延伸應用
 可依需求擴充：
