@@ -1,8 +1,4 @@
 # burn-it-up-fhir
-FHIR 大健康比賽
-
-# FHIR大健康
-組別：burn it up 
 
 ## 一、資料規格文件（FHIR Resource 設計）
 
