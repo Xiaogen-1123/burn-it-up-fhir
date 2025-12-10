@@ -44,8 +44,7 @@
 ---
 
 ### **（1）建立 Person（登入帳號）**
---  person.json
-
+```json
 {
   "resourceType": "Person",
   "identifier": [
