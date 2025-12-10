@@ -1,0 +1,8 @@
+{
+  "resourceType": "Person",
+  "identifier": [
+    { "system": "http://example.org/email", "value": "xiaoming@example.com" }
+  ],
+  "name": [{ "text": "林小明" }]
+}
+ 
