@@ -1,6 +1,24 @@
 # burn-it-up-fhir
+---
 
-## 一、資料規格文件（FHIR Resource 設計）
+## 一、主題及應用情境
+
+本系統提供一套使用 FHIR 標準打造的活動報名平台，支援病患登入後，查看可參加的活動與時段，並直接完成預約。
+
+應用情境如下：
+
+- 使用者登入系統後，會根據其 Email 與 Person 資料綁定身分。
+- 若使用者尚無病患紀錄（Patient），系統會自動建立。
+- 平台顯示主辦單位排定的活動，搭配 Schedule 與 Slot 呈現可預約時段。
+- 使用者選擇時段後可完成報名，並紀錄參加方式與用餐偏好。
+- 系統會建立 Appointment，並改變 Slot 狀態避免重複預約。
+
+此平台可用於醫院健檢報名、健康講座、校園活動等需要排班與報名管理的場合。
+
+---
+
+
+## 二、資料規格文件（FHIR Resource 設計）
 
 本系統使用以下 FHIR 資源：
 
@@ -37,7 +55,7 @@
 
 ---
 
-## 二、程式碼及執行結果示例（FHIR JSON）
+## 三、程式碼及執行結果示例（FHIR JSON）
 
 以下展示建立 Person、Patient 與 Appointment 的完整 JSON。
 
@@ -98,3 +116,31 @@
   ]
 }
 ```
+## 四、說明文件（FHIR 實作邏輯）
+1. 使用者登入邏輯
+- 系統依 Email 查詢 Person
+- 若無對應 Patient → 自動建立 Patient
+
+2. 查詢活動與時段
+- 使用 Schedule 顯示活動排班資訊
+- 使用 Slot 顯示可預約時段（status = free）
+
+3. 建立報名（Appointment）邏輯
+- 使用者選定 Slot 後：
+    -      建立 Appointment
+    - 將 Slot.status = busy
+    - participant 連結 Patient 與活動人員
+    - extension 記錄用餐偏好（葷 / 素）
+
+4. 查詢應用示例
+- 查某 Slot 的所有預約紀錄（Appointment.slot）
+- 查某醫師的排班（Schedule.actor + PractitionerRole）
+
+## 五、程式可能延伸應用
+可依需求擴充：
+- 報名通知功能（Email / SMS）
+- 候補名單（Slot 額滿加入候補）
+- 修改 / 取消預約（同步更新 Slot 狀態）
+- 活動分析報表（熱門時段、參加率）
+- 整合院內系統（健檢、門診等流程）
+
