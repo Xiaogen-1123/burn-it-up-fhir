@@ -1,9 +1,0 @@
-
-{
-  "resourceType": "Patient",
-  "identifier": [
-    { "system": "http://example.org/person-id", "value": "PERSON-123" }
-  ],
-  "name": [{ "text": "林小明" }],
-  "managingOrganization": { "reference": "Organization/tcu" }
-}
