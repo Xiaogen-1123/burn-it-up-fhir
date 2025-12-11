@@ -1,0 +1,9 @@
+{
+  "resourceType": "Patient",
+  "id": "patient-001",
+  "name": [{ "use": "official", "text": "王小明" }],
+  "gender": "male",
+  "birthDate": "1990-01-01",
+  "telecom": [{ "system": "phone", "value": "0912345678", "use": "mobile" }],
+  "link": [{ "other": { "reference": "Person/person-001" }, "type": "seealso" }]
+}

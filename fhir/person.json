@@ -1,0 +1,7 @@
+{
+  "resourceType": "Person",
+  "id": "person-001",
+  "name": [{ "text": "王小明" }],
+  "identifier": [{ "system": "http://example.org/fhir/email", "value": "test@example.com" }],
+  "telecom": [{ "system": "email", "value": "test@example.com", "use": "home" }]
+}

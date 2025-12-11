@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>註冊系統</title>
+</head>
+<body>
+<h1>註冊系統</h1>
+<form id="registerForm">
+  <label>姓名: <input type="text" name="name" required></label><br>
+  <label>Email: <input type="email" name="email" required></label><br>
+  <label>電話: <input type="text" name="phone"></label><br>
+  <label>性別: 
+    <select name="gender">
+      <option value="male">男</option>
+      <option value="female">女</option>
+      <option value="other">其他</option>
+    </select>
+  </label><br>
+  <label>生日: <input type="date" name="birthDate"></label><br>
+  <button type="submit">註冊</button>
+</form>
+
+<script>
+const form = document.getElementById('registerForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(form));
+  const res = await fetch('/api/register', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  alert(JSON.stringify(result, null, 2));
+});
+</script>
+</body>
+</html>
