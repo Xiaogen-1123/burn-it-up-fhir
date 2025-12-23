@@ -1,9 +1,26 @@
 {
   "resourceType": "Patient",
   "id": "patient-001",
-  "name": [{ "use": "official", "text": "王小明" }],
+  "active": true,
+  "name": [
+    { "use": "official", "text": "小根" }
+  ],
   "gender": "male",
-  "birthDate": "1990-01-01",
-  "telecom": [{ "system": "phone", "value": "0912345678", "use": "mobile" }],
-  "link": [{ "other": { "reference": "Person/person-001" }, "type": "seealso" }]
+  "birthDate": "2005-01-01",
+  "telecom": [
+    {
+      "system": "email",
+      "value": "xiaogen@example.com"
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://example.org/fhir/diet",
+      "valueString": "素食"
+    },
+    {
+      "url": "http://example.org/fhir/mode",
+      "valueString": "實體"
+    }
+  ]
 }

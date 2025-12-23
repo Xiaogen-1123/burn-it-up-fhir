@@ -1,7 +1,24 @@
 {
   "resourceType": "Person",
   "id": "person-001",
-  "name": [{ "text": "王小明" }],
-  "identifier": [{ "system": "http://example.org/fhir/email", "value": "test@example.com" }],
-  "telecom": [{ "system": "email", "value": "test@example.com", "use": "home" }]
+  "active": true,
+  "name": [
+    { "text": "小根" }
+  ],
+  "telecom": [
+    {
+      "system": "email",
+      "value": "xiaogen@example.com",
+      "use": "home"
+    }
+  ],
+  "link": [
+    {
+      "target": {
+        "reference": "Patient/53665445", 
+        "display": "小根的病人資料"
+      },
+      "assurance": "level2"
+    }
+  ]
 }

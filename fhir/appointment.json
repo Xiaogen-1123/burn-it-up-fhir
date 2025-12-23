@@ -1,10 +1,28 @@
 {
   "resourceType": "Appointment",
   "status": "booked",
-  "description": "牙科檢查",
+  "description": "活動報名：牙科檢查",
   "start": "2025-12-15T10:00:00+08:00",
   "end": "2025-12-15T10:30:00+08:00",
+  "slot": [
+    {
+      "reference": "Slot/slot-example-001"
+    }
+  ],
   "participant": [
-    { "actor": { "reference": "Patient/patient-001" }, "status": "accepted" }
+    {
+      "actor": { "reference": "Patient/53665445" }, 
+      "status": "accepted"
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://example.org/fhir/diet",
+      "valueString": "素食"
+    },
+    {
+      "url": "http://example.org/fhir/mode",
+      "valueString": "實體"
+    }
   ]
 }

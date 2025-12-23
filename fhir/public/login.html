@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>活動報名系統</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 380px; text-align: center; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        label { display: block; text-align: left; font-size: 14px; color: #666; margin-top: 10px; font-weight: bold; }
+        
+        /* 初始隱藏報名區塊 */
+        #bookingSection { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 10px; }
+        .step-tag { background: #eee; padding: 2px 8px; border-radius: 4px; font-size: 12px; float: right; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2 id="mainTitle">活動系統登入</h2>
+
+    <div id="loginSection">
+        <span class="step-tag">Step 1</span>
+        <label>姓名</label>
+        <input type="text" id="name" placeholder="輸入姓名" value="小根">
+        <label>Email (身分識別)</label>
+        <input type="email" id="email" placeholder="輸入 Email">
+        <button id="loginBtn" onclick="handleLogin()">確認身分</button>
+    </div>
+
+    <div id="bookingSection">
+        <span class="step-tag">Step 2</span>
+        <h3 id="welcomeMsg" style="color: #28a745;">你好！請選擇報名資訊</h3>
+        
+        <label>用餐偏好</label>
+        <select id="diet">
+            <option value="葷食">葷食</option>
+            <option value="素食">素食</option>
+            <option value="過敏待註記">過敏待註記</option>
+        </select>
+        
+        <label>參加方式</label>
+        <select id="mode">
+            <option value="實體">實體</option>
+            <option value="線上">線上</option>
+        </select>
+
+        <label>選擇預約時段</label>
+        <select id="slotSelect">
+            <option value="">載入時段中...</option>
+        </select>
+
+        <button id="bookBtn" onclick="handleBooking()" style="background-color: #28a745;">送出報名資料</button>
+    </div>
+</div>
+
+<script>
+let currentPatientId = null;
+
+// 1. 處理登入/身分識別
+async function handleLogin() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const btn = document.getElementById('loginBtn');
+
+    if (!name || !email) return alert("請填寫姓名與 Email");
+
+    try {
+        btn.disabled = true;
+        btn.innerText = "驗證中...";
+
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email })
+        });
+        const result = await res.json();
+
+        if (res.ok && result.patientId) {
+            currentPatientId = result.patientId;
+            // 切換 UI
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('bookingSection').style.display = 'block';
+            document.getElementById('mainTitle').innerText = "活動報名";
+            document.getElementById('welcomeMsg').innerText = `你好，${name}！`;
+            
+            // 觸發加載時段
+            loadSlots();
+        } else {
+            throw new Error(result.error || "驗證失敗");
+        }
+    } catch (err) {
+        alert(err.message);
+        btn.disabled = false;
+        btn.innerText = "確認身分";
+    }
+}
+
+// 2. 加載時段
+async function loadSlots() {
+    try {
+        const res = await fetch('/api/slots');
+        const slots = await res.json();
+        const select = document.getElementById('slotSelect');
+        select.innerHTML = '';
+
+        if (!slots || slots.length === 0) {
+            select.innerHTML = '<option value="">目前無空閒時段</option>';
+        } else {
+            slots.forEach(slot => {
+                const opt = document.createElement('option');
+                opt.value = slot.id;
+                opt.innerText = new Date(slot.start).toLocaleString('zh-TW');
+                select.appendChild(opt);
+            });
+        }
+    } catch (err) {
+        console.error("載入時段失敗", err);
+    }
+}
+
+// 3. 處理報名送出
+async function handleBooking() {
+    const btn = document.getElementById('bookBtn');
+    const slotId = document.getElementById('slotSelect').value;
+    if (!slotId) return alert("請選擇時段");
+
+    try {
+        btn.disabled = true;
+        btn.innerText = "提交中...";
+
+        const res = await fetch('/api/book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                patientId: currentPatientId,
+                diet: document.getElementById('diet').value,
+                mode: document.getElementById('mode').value,
+                slotId: slotId
+            })
+        });
+
+        if (res.ok) {
+            alert("恭喜！報名成功。");
+            location.reload(); // 完成後重置
+        } else {
+            alert("報名失敗，請稍後再試");
+        }
+    } catch (err) {
+        alert("錯誤: " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "送出報名資料";
+    }
+}
+</script>
+
+</body>
+</html>
