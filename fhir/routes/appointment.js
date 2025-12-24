@@ -4,29 +4,34 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 
 const FHIR_BASE = 'http://hapi.fhir.org/baseR4';
 
-// [GET] 查詢所有狀態為 free 的 Slot
+// [GET] 提供固定的兩個時段選項
 router.get('/slots', async (req, res) => {
-    try {
-        const response = await fetch(`${FHIR_BASE}/Slot?status=free&_count=10`);
-        const data = await response.json();
-        
-        if (!data.entry) return res.json([]);
-
-        // 只取出需要的欄位給前端
-        const slots = data.entry.map(item => ({
-            id: item.resource.id,
-            start: item.resource.start,
-            end: item.resource.end
-        }));
-        res.json(slots);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    // 這裡手動定義你要的兩個時段，並加上 display 欄位供前端顯示
+    const fixedSlots = [
+        {
+            id: "52229", 
+            display: "上午 10:00 - 12:00",
+            start: "2025-12-24T10:00:00+08:00"
+        },
+        {
+            id: "52223", 
+            display: "下午 02:00 - 04:00",
+            start: "2025-12-24T14:00:00+08:00"
+        }
+    ];
+    
+    // 直接回傳這兩個固定選項
+    res.json(fixedSlots);
 });
 
 // [POST] 建立預約
 router.post('/book', async (req, res) => {
     const { patientId, diet, mode, slotId } = req.body;
+
+    // 簡單檢查必填欄位
+    if (!patientId || !slotId) {
+        return res.status(400).json({ error: "缺少必要的報名資訊" });
+    }
 
     try {
         const apptRes = await fetch(`${FHIR_BASE}/Appointment`, {
@@ -35,10 +40,16 @@ router.post('/book', async (req, res) => {
             body: JSON.stringify({
                 resourceType: "Appointment",
                 status: "booked",
+                // 連結時段
                 slot: [{ reference: `Slot/${slotId}` }],
+                // 連結病人
                 participant: [
-                    { actor: { reference: `Patient/${patientId}` }, status: "accepted" }
+                    { 
+                        actor: { reference: `Patient/${patientId}` }, 
+                        status: "accepted" 
+                    }
                 ],
+                // 存入擴充欄位：葷素、方式
                 extension: [
                     { url: "http://example.org/fhir/diet", valueString: diet },
                     { url: "http://example.org/fhir/mode", valueString: mode }
@@ -46,11 +57,17 @@ router.post('/book', async (req, res) => {
             })
         });
 
-        if (!apptRes.ok) throw new Error("FHIR 伺服器拒絕建立 Appointment");
+        const result = await apptRes.json();
 
-        console.log(`[Slot] Slot/${slotId} 已被佔用`);
-        res.json({ status: "success" });
+        if (!apptRes.ok) {
+            console.error("FHIR 錯誤回傳:", result);
+            throw new Error("FHIR 伺服器拒絕建立預約");
+        }
+
+        console.log(`成功建立預約！ID: ${result.id}`);
+        res.json({ status: "success", appointmentId: result.id });
     } catch (err) {
+        console.error("預約處理出錯:", err.message);
         res.status(500).json({ error: err.message });
     }
 });

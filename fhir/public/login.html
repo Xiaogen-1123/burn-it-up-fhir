@@ -98,7 +98,7 @@ async function handleLogin() {
     }
 }
 
-// 2. 加載時段
+// 2. 加載時段 (已修改為顯示固定文字)
 async function loadSlots() {
     try {
         const res = await fetch('/api/slots');
@@ -112,12 +112,15 @@ async function loadSlots() {
             slots.forEach(slot => {
                 const opt = document.createElement('option');
                 opt.value = slot.id;
-                opt.innerText = new Date(slot.start).toLocaleString('zh-TW');
+                // --- 修改處：直接顯示後端給的 display 文字 ---
+                opt.innerText = slot.display; 
                 select.appendChild(opt);
             });
         }
     } catch (err) {
         console.error("載入時段失敗", err);
+        const select = document.getElementById('slotSelect');
+        select.innerHTML = '<option value="">載入時段出錯</option>';
     }
 }
 
