@@ -4,23 +4,26 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 
 const FHIR_BASE = 'http://hapi.fhir.org/baseR4';
 
+// 定義 ID 與顯示文字的對照表，方便在 POST 時抓取對應的文字
+const slotTimeMap = {
+    "52229": "上午 10:00 - 12:00",
+    "52223": "下午 02:00 - 04:00"
+};
+
 // [GET] 提供固定的兩個時段選項
 router.get('/slots', async (req, res) => {
-    // 這裡手動定義你要的兩個時段，並加上 display 欄位供前端顯示
     const fixedSlots = [
         {
             id: "52229", 
-            display: "上午 10:00 - 12:00",
+            display: slotTimeMap["52229"],
             start: "2025-12-24T10:00:00+08:00"
         },
         {
             id: "52223", 
-            display: "下午 02:00 - 04:00",
+            display: slotTimeMap["52223"],
             start: "2025-12-24T14:00:00+08:00"
         }
     ];
-    
-    // 直接回傳這兩個固定選項
     res.json(fixedSlots);
 });
 
@@ -28,10 +31,12 @@ router.get('/slots', async (req, res) => {
 router.post('/book', async (req, res) => {
     const { patientId, diet, mode, slotId } = req.body;
 
-    // 簡單檢查必填欄位
     if (!patientId || !slotId) {
         return res.status(400).json({ error: "缺少必要的報名資訊" });
     }
+
+    // 根據 slotId 找出對應的顯示文字
+    const slotDisplayText = slotTimeMap[slotId] || "未指定時段";
 
     try {
         const apptRes = await fetch(`${FHIR_BASE}/Appointment`, {
@@ -40,16 +45,17 @@ router.post('/book', async (req, res) => {
             body: JSON.stringify({
                 resourceType: "Appointment",
                 status: "booked",
-                // 連結時段
-                slot: [{ reference: `Slot/${slotId}` }],
-                // 連結病人
+                // --- 關鍵修改：加入 display 欄位 ---
+                slot: [{ 
+                    reference: `Slot/${slotId}`,
+                    display: slotDisplayText  // 這樣 HAPI 原始資料就會顯示文字了
+                }],
                 participant: [
                     { 
                         actor: { reference: `Patient/${patientId}` }, 
                         status: "accepted" 
                     }
                 ],
-                // 存入擴充欄位：葷素、方式
                 extension: [
                     { url: "http://example.org/fhir/diet", valueString: diet },
                     { url: "http://example.org/fhir/mode", valueString: mode }

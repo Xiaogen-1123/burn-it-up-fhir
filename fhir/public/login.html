@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>活動報名系統</title>
+    <title>健康講座報名</title>
     <style>
         body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7f6; margin: 0; }
         .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 380px; text-align: center; }
@@ -19,7 +19,7 @@
 <body>
 
 <div class="card">
-    <h2 id="mainTitle">活動系統登入</h2>
+    <h2 id="mainTitle">健康講座報名</h2>
 
     <div id="loginSection">
         <span class="step-tag">Step 1</span>
@@ -83,7 +83,9 @@ async function handleLogin() {
             // 切換 UI
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('bookingSection').style.display = 'block';
-            document.getElementById('mainTitle').innerText = "活動報名";
+            
+            // 修改 2: 確認身分後的標題也維持「健康講座報名」
+            document.getElementById('mainTitle').innerText = "健康講座報名";
             document.getElementById('welcomeMsg').innerText = `你好，${name}！`;
             
             // 觸發加載時段
@@ -98,7 +100,7 @@ async function handleLogin() {
     }
 }
 
-// 2. 加載時段 (已修改為顯示固定文字)
+// 2. 加載時段 (使用你指定的固定 display 欄位)
 async function loadSlots() {
     try {
         const res = await fetch('/api/slots');
@@ -112,7 +114,7 @@ async function loadSlots() {
             slots.forEach(slot => {
                 const opt = document.createElement('option');
                 opt.value = slot.id;
-                // --- 修改處：直接顯示後端給的 display 文字 ---
+                // 直接顯示後端傳來的 display 文字
                 opt.innerText = slot.display; 
                 select.appendChild(opt);
             });
@@ -147,7 +149,7 @@ async function handleBooking() {
 
         if (res.ok) {
             alert("恭喜！報名成功。");
-            location.reload(); // 完成後重置
+            location.reload(); 
         } else {
             alert("報名失敗，請稍後再試");
         }
